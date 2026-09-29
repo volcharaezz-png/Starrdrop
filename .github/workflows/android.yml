@@ -27,7 +27,7 @@ jobs:
         sudo apt-get install -y build-essential libsqlite3-dev sqlite3 bzip2 libbz2-dev \
           zlib1g-dev libssl-dev openssl libgdbm-dev libgdbm-compat-dev liblldb-dev \
           libffi-dev libreadline-dev libncurses5-dev libncursesw5-dev liblzma-dev \
-          ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixin-dev libsdl2-ttf-dev \
+          ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev \
           libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev \
           autoconf automake libtool pkg-config
 
@@ -39,20 +39,17 @@ jobs:
     - name: Install Buildozer and Cython
       run: |
         pip install --upgrade pip
-        pip install buildozer cython
-
-    - name: Accept Android SDK Licenses
-      run: |
-        mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
-        yes | sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk --licenses || true
+        pip install buildozer cython==0.29.33
 
     - name: Build APK with Buildozer
       run: |
-        yes | buildozer -v android debug
+        buildozer init
+        sed -i 's/# android.accept_sdk_licenses = False/android.accept_sdk_licenses = True/g' buildozer.spec
+        buildozer -v android debug
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: package
+        name: starrdrop-apk
         path: bin/*.apk
         
