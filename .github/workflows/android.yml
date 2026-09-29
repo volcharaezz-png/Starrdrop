@@ -19,12 +19,12 @@ jobs:
           sudo apt install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libreadline-dev libsqlite3-dev libgdbm-dev libdb5.3-dev libbz2-dev libexpat1-dev liblzma-dev tk-dev libffi-dev
           pip install --upgrade buildozer Cython==0.29.33
 
-      - name: Accept Android Licenses & Build APK
+      - name: Build APK with Buildozer
         run: |
           buildozer init
           sed -i 's/requirements = python3,kivy/requirements = python3,kivy/g' buildozer.spec
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          yes | buildozer -v android debug
+          sed -i 's/# android.accept_sdk_licenses = False/android.accept_sdk_licenses = True/g' buildozer.spec
+          buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
